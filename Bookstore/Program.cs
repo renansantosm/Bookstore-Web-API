@@ -1,5 +1,6 @@
 using Bookstore.Context;
 using Bookstore.DTOs.Mapping;
+using Bookstore.Extensions;
 using Bookstore.Repositories;
 using Bookstore.Services;
 using Bookstore.Services.Interfaces;
@@ -39,6 +40,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();

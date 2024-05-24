@@ -16,13 +16,25 @@ public class BooksController : ControllerBase
         _bookService = bookService;
     }
 
+    [HttpGet("{skip:int}/{take:int}")]
+    public async Task<ActionResult> GetBooksPaged([FromRoute]int skip, [FromRoute]int take)
+    {
+        var books = await _bookService.GetBooksPaged(skip, take);
+
+        if (books is null)
+            return NotFound("Books not found");
+
+        return Ok(books);
+    }
+
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BookDTO>>> Get()
     {
         var booksDto = await _bookService.GetBooks();
 
         if (booksDto is null) 
-            return NotFound("books not found");
+            return NotFound("Books not found");
 
         return Ok(booksDto);
     }

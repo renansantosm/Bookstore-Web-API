@@ -4,6 +4,7 @@ namespace Bookstore.Services.Interfaces;
 
 public interface IBookService
 {
+    Task<IEnumerable<BookDTO>> GetBooksPaged(int skip, int take);
     Task<IEnumerable<BookDTO>> GetBooks();
     Task<BookDTO> GetBookById(int id);
     Task AddBook(BookDTO bookDTO);

@@ -15,7 +15,7 @@ namespace Bookstore.Repositories
 
         public async Task<IEnumerable<Genre>> GetAll()
         {
-            return await _context.Genres.ToListAsync();
+            return await _context.Genres.AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<Genre>> GetGenresBooks()

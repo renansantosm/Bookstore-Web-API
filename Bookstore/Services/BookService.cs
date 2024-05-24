@@ -17,6 +17,12 @@ public class BookService : IBookService
         _mapper = mapper;
     }
 
+    public async Task<IEnumerable<BookDTO>> GetBooksPaged(int skip, int take)
+    {
+        var books = await _bookRepository.GetBooksPaged(skip, take);
+        return _mapper.Map<IEnumerable<BookDTO>>(books);
+    }
+
     public async Task<IEnumerable<BookDTO>> GetBooks()
     {
         var booksEntities = await _bookRepository.GetAll();
@@ -47,5 +53,4 @@ public class BookService : IBookService
         var bookEntity = _bookRepository.GetBookById(id).Result;
         await _bookRepository.Delete(bookEntity.Id);
     }
-
 }

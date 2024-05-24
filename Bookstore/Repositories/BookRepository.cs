@@ -13,6 +13,11 @@ public class BookRepository : IBookRepository
         _context = context;
     }
 
+    public async Task<IEnumerable<Book>> GetBooksPaged(int skip, int take)
+    {
+        return await _context.Books.Skip(skip).Take(take).ToListAsync();
+    }
+
     public async Task<Book> GetBookById(int id)
     {
         return await _context.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
@@ -42,5 +47,4 @@ public class BookRepository : IBookRepository
         await _context.SaveChangesAsync();
         return book;
     }
-
 }

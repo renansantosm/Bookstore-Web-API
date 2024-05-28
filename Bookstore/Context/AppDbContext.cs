@@ -1,9 +1,11 @@
 ﻿using Bookstore.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Bookstore.Context;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     { }
@@ -13,6 +15,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
+        base.OnModelCreating(mb);
+
         // Genre
         mb.Entity<Genre>().HasKey(g => g.GenreId); // Opcional, o EF Core obtem automaticamente O ID
 

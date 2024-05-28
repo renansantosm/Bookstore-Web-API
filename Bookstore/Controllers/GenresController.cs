@@ -1,5 +1,6 @@
 ﻿using Bookstore.DTOs;
 using Bookstore.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ public class GenresController : ControllerBase
         _genreService = genreService;
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GenreDTO>>> Get()
     {

@@ -86,6 +86,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
+
 builder.Services.AddScoped<IGenreRepository,GenreRepository>();
 builder.Services.AddScoped<IBookRepository,BookRepository>();
 builder.Services.AddScoped<IGenreService,GenreService>();

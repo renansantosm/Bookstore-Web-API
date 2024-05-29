@@ -17,7 +17,7 @@ public class GenresController : ControllerBase
         _genreService = genreService;
     }
 
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GenreDTO>>> Get()
     {

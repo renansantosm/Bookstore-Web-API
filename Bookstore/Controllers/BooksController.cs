@@ -1,5 +1,6 @@
 ﻿using Bookstore.DTOs;
 using Bookstore.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,7 +28,7 @@ public class BooksController : ControllerBase
         return Ok(books);
     }
 
-
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BookDTO>>> Get()
     {

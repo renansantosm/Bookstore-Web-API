@@ -1,12 +1,14 @@
 ﻿using Bookstore.DTOs;
 using Bookstore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bookstore.Controllers;
 
 [Route("api/[controller]")]
+[EnableCors("OriginWithAccessAllowed")]
 [ApiController]
 public class GenresController : ControllerBase
 {

@@ -7,11 +7,13 @@ using Bookstore.Services;
 using Bookstore.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().
     AddJsonOptions(options =>
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OriginWithAccessAllowed",
+        policy =>
+        {
+            policy.WithOrigins("https://apirequest.io")
+            .WithOrigins("GET", "POST")
+            .AllowAnyHeader();
+        });
+});
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -91,6 +105,35 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
+builder.Services.AddRateLimiter(rateLimiterOptions =>
+{
+    rateLimiterOptions.AddFixedWindowLimiter(policyName: "fixedWindow", options =>
+    {
+        options.PermitLimit = 1;
+        options.Window = TimeSpan.FromSeconds(5);
+        options.QueueLimit = 2;
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+
+    rateLimiterOptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpcontext =>
+                            RateLimitPartition.GetFixedWindowLimiter(
+                                               partitionKey: httpcontext.User.Identity?.Name ?? httpcontext.Request.Headers.Host.ToString(),
+                            factory: partition => new FixedWindowRateLimiterOptions
+                            {
+                                AutoReplenishment = true, 
+                                PermitLimit = 2, 
+                                QueueLimit = 0, 
+                                Window = TimeSpan.FromSeconds(10)
+                            }));
+});
+
 builder.Services.AddScoped<IGenreRepository,GenreRepository>();
 builder.Services.AddScoped<IBookRepository,BookRepository>();
 builder.Services.AddScoped<IGenreService,GenreService>();
@@ -111,9 +154,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseRateLimiter();
+app.UseCors();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
